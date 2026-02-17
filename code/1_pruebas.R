@@ -69,19 +69,21 @@ shapiro.test(sample(df$punt_global, 500))
 # ---------------------------------------------------------------------
 
 
-# Wilcoxon (Mann–Whitney)
-w <- wilcox.test(punt_global ~ cole_area_ubicacion, data = df)
-# Tamaño de efecto
-wEff <- wilcox_effsize(punt_global ~ cole_area_ubicacion, data = df)
-wEff
+# Wilcoxon rank-sum test (Equivalente a Mann–Whitney; ver ?wilcox.test)
+wilcox.test(punt_global ~ cole_area_ubicacion, data = df)
+
+# Tamaño de efecto r para Mann–Whitney (ver ?wilcox_effsize)
+wilcox_effsize(punt_global ~ cole_area_ubicacion, data = df)
+
+
 
 # Kruskal
-k <- kruskal.test(punt_global ~ edu_max_padres, data = df)
-kEff <- kruskal_effsize(punt_global ~ edu_max_padres, data = df)
-kEff
+kruskal.test(punt_global ~ edu_max_padres, data = df)
+kruskal_effsize(punt_global ~ edu_max_padres, data = df)
+
 
 # --------------------------------
-# Tabla para todas las variables
+# Tabla de estas pruebas para todas las variables
 # --------------------------------
 vars_cat <- colnames(df[, 16:30])
 
@@ -112,7 +114,7 @@ analisis_no_param <- function(data, var_cat) {
     resumen %>%
       mutate(
         Variable = var_cat,
-        Prueba = "Wilcoxon",  
+        Prueba = "Mann–Whitney",  # Cambio de nombre con el que etiqueta la tabla
         Estadistico = test$statistic,
         gl = NA,
         p_value = test$p.value,
