@@ -50,3 +50,6 @@ rsconnect/
 
 # Datos crudos (no versionar)
 data/raw/
+
+# output, mucha tabla o lista de imagenes que no ha de ir en el git
+output

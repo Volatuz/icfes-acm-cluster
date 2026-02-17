@@ -123,11 +123,12 @@ df <- df %>%
   mutate(
     tiene_vehiculo = case_when(
       fami_tienemotocicleta == "Si" | fami_tieneautomovil == "Si" ~ "VEH.Sí",
-      fami_tienemotocicleta == "No" & fami_tieneautomovil == "No" ~ "VEH.No"
+      fami_tienemotocicleta == "No" & fami_tieneautomovil == "No" ~ "VEH.No",
+      TRUE ~ NA_character_
     ),
     tiene_vehiculo = factor(tiene_vehiculo, levels = c("VEH.No", "VEH.Sí"))
   ) %>%
-  select(-fami_tienemotocicleta, -fami_tieneautomovil)
+  dplyr::select(-fami_tieneautomovil, -fami_tienemotocicleta)
 
 # Maximo nivel educativo padres
 edu_levels <- c(
@@ -179,13 +180,74 @@ df <- df %>%
   ) %>%
   select(-n_cuartos, -n_personas, -fami_cuartoshogar, -fami_personashogar)
 
-# Trabaja o no
+
+# Recategorización multiples variables desbalanceadas
+
 df <- df %>%
   mutate(
     trabaja_cat = if_else(estu_horassemanatrabaja == "0", "NoTrabaja", "Trabaja")
   ) %>%
   select(-estu_horassemanatrabaja)
 df$trabaja_cat <- as.factor(df$trabaja_cat) 
+
+
+df <- df %>%
+  mutate(
+    fami_estratovivienda = ifelse(fami_estratovivienda %in% c("Estrato 1", "Sin Estrato"), "Est.1-",
+                                  ifelse(fami_estratovivienda == "Estrato 2", "Est.2",
+                                         ifelse(fami_estratovivienda == "Estrato 3", "Est.3",
+                                                ifelse(fami_estratovivienda %in% c("Estrato 4","Estrato 5", "Estrato 6"), "Est.4+", NA))))
+  )
+df$fami_estratovivienda <- factor(df$fami_estratovivienda, levels = c( "Est.1-", "Est.2","Est.3", "Est.4+"), ordered = TRUE)
+
+df <- df %>%
+  mutate(
+    fami_comecarnepescadohuevo = case_when(
+      `fami_comecarnepescadohuevo` %in% c("Nunca o rara vez comemos eso", "1 o 2 veces por semana") ~ "Carne.0a2",
+      `fami_comecarnepescadohuevo` == "3 a 5 veces por semana" ~ "Carne.3a5",
+      `fami_comecarnepescadohuevo` == "Todos o casi todos los días" ~ "Carne.diario",
+      TRUE ~ as.character(`fami_comecarnepescadohuevo`)
+    ),
+    
+    fami_numlibros = case_when(
+      `fami_numlibros` %in% c("MÁS DE 100 LIBROS", "26 A 100 LIBROS") ~ "Lib.+25 libros",
+      `fami_numlibros` == "11 A 25 LIBROS" ~ "Lib.11a25 libros",
+      `fami_numlibros` == "0 A 10 LIBROS" ~ "Lib.0a10 libros",
+      TRUE ~ as.character(`fami_numlibros`)
+    ),
+    
+    estu_dedicacionlecturadiaria = case_when(
+      `estu_dedicacionlecturadiaria` %in% c("No leo por entretenimiento", "30 minutos o menos") ~ "Lee.0a30minutos",
+      `estu_dedicacionlecturadiaria` == "Entre 30 y 60 minutos" ~ "Lee.30a60min",
+      `estu_dedicacionlecturadiaria` == "Entre 1 y 2 horas" ~ "Lee.1a2horas",
+      `estu_dedicacionlecturadiaria` == "Más de 2 horas" ~ "Lee.2horas+",
+      TRUE ~ as.character(`estu_dedicacionlecturadiaria`)
+    ),
+    
+    estu_dedicacioninternet = case_when(
+      `estu_dedicacioninternet` %in% c("No Navega Internet", "30 minutos o menos") ~ "Net.30Minutos-",
+      `estu_dedicacioninternet` == "Entre 30 y 60 minutos" ~ "Net.30a60min",
+      `estu_dedicacioninternet` == "Entre 1 y 3 horas" ~ "Net.1a3horas",
+      `estu_dedicacioninternet` == "Más de 3 horas" ~ "Net.3horas+",
+      TRUE ~ as.character(`estu_dedicacioninternet`)
+    ),
+    estu_genero = case_when(
+      `estu_genero` == "F" ~ "Sex.F",
+      `estu_genero` == "M" ~ "Sex.M",
+      TRUE ~ as.character(`estu_genero`)
+    ),
+    fami_situacioneconomica = case_when(
+      `fami_situacioneconomica` == "Igual" ~ "Situ.Igual",
+      `fami_situacioneconomica` == "Mejor" ~ "Situ.Mejor",
+      `fami_situacioneconomica` == "Peor" ~ "Situ.Peor",
+      TRUE ~ as.character(`fami_situacioneconomica`)
+    ),
+    fami_tienecomputador = case_when(
+      `fami_tienecomputador` == "No" ~ "Compu.No",
+      `fami_tienecomputador` == "Si" ~ "Compu.Si",
+      TRUE ~ as.character(`fami_tienecomputador`)
+    )
+  )
 
 # Puntaje global en cuartiles
 cuartil <- function(x) {
@@ -214,6 +276,7 @@ df <- df %>%
     )
   ) %>%
   filter(!is.na(cole_tipo))
+
 
 # Drop de nas
 df <- na.omit(df)
