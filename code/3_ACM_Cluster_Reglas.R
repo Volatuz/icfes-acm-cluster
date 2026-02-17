@@ -55,19 +55,35 @@ ACM <- MCA(X = df_sample, graph = FALSE, ncp = 9)
 ACM
 summary(ACM)
 
-# Contribuciones absolutas de cada variable en 5 dimensiones
-p1 <- fviz_contrib(ACM, choice = "var", axes = 1, top = 15)
-p2 <- fviz_contrib(ACM, choice = "var", axes = 2, top = 15)
-p3 <- fviz_contrib(ACM, choice = "var", axes = 3, top = 15)
-p4 <- fviz_contrib(ACM, choice = "var", axes = 4, top = 15)
-
-grid.arrange(p1, p2, p3, p4, ncol = 2)
-
 fviz_screeplot(ACM,
                labelsize = 0.1,
                addlabels = TRUE,
                barfill = "slategray1",
-               line = 2.0)
+               line = 2.0)+
+  labs(
+    x = "Dimensiones",
+    y = "Porcentaje de inercia explicada"
+  )
+
+# Contribuciones absolutas de cada variable en 4 dimensiones
+p1 <- fviz_contrib(ACM, choice = "var", axes = 1, top = 15) +
+  ggtitle("Contribución de las categorías a la Dimensión 1") +
+  labs(y = "Contribución (%)")
+
+p2 <- fviz_contrib(ACM, choice = "var", axes = 2, top = 15) +
+  ggtitle("Contribución de las categorías a la Dimensión 2") +
+  labs(y = "Contribución (%)")
+
+p3 <- fviz_contrib(ACM, choice = "var", axes = 3, top = 15) +
+  ggtitle("Contribución de las categorías a la Dimensión 3") +
+  labs(y = "Contribución (%)")
+
+p4 <- fviz_contrib(ACM, choice = "var", axes = 4, top = 15) +
+  ggtitle("Contribución de las categorías a la Dimensión 4") +
+  labs(y = "Contribución (%)")
+
+grid.arrange(p1, p2, p3, p4, ncol = 2)
+
 
 corrplot(ACM$var$contrib, is.corr = FALSE)
 
@@ -196,9 +212,10 @@ df_1 <- df_1[,14:29]
 df_2 <- df_2[,14:29]
 df_3 <- df_3[,14:29]
 
-trx <- df_1
+## 
+trx <- df_3
 #trx$hacinamiento <- NULL
-#trx$estu_genero <- NULL
+trx$estu_genero <- NULL
 
 # Convertir a transacciones
 trx <- as(trx, "transactions")
@@ -208,12 +225,14 @@ itemLabels(trx) <- gsub("^.*=", "", itemLabels(trx))
 summary(trx)
 itemFrequency(trx, type = "absolute")[1:20]
 
-# Graficar categorías más frecuentes
-itemFrequencyPlot(trx, topN = 20, 
-                  type = "absolute", 
-                  col = colors[1],
+itemFrequencyPlot(trx,
+                  topN = 20,
+                  type = "absolute",
+                  col = colors[3],
                   border = NA,
-                  main = "Características más Frecuentes del Cluster 3")
+                  #main = "Características más frecuentes del Cluster 3",
+                  ylab = "Frecuencia absoluta")
+
 
 ##############################
 # Generación de reglas de asociación
