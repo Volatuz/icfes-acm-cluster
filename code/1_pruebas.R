@@ -1,9 +1,10 @@
 # =====================================================================
 # PRUEBAS ESTADÍSTICAS – ANÁLISIS SABER 11 (TOLIMA, 2024)
-# =====================================================================
+# Autor: German Pava
 # Este script realiza análisis descriptivos, pruebas de normalidad,
 # contrastes no paramétricos, pruebas post hoc y asociaciones mediante
 # chi-cuadrado, con los datos limpios: ../data/processed/ICFES2024-Tolima.txt" .
+# Ademas de exportar una tabla de pruebas a ../output
 # =====================================================================
 
 
@@ -35,9 +36,8 @@ df <- read.table(
 df[] <- lapply(df, function(col) {
   if (!is.factor(col)) as.factor(col) else col
 })
-
-# Conversión explícita del puntaje global a numérico
-df$punt_global <- as.numeric(df$punt_global)
+df$punt_global <- as.numeric(as.character(df$punt_global))
+#punt_global a double
 
 
 # ---------------------------------------------------------------------

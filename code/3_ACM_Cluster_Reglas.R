@@ -1,3 +1,10 @@
+############################################################
+# ICFES Saber 11 - Análisis MCA y reglas de asociación (2024)
+# Autor: German Pava
+# Objetivo: análisis de correspondencias múltiples,
+#           clustering y reglas de asociación por cluster
+############################################################
+
 ##############################
 # Librerías y carga de datos
 ##############################
